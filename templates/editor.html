@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+
+{% block title %}{{ script.title if script else 'New Script' }} - YouTube Script Manager{% endblock %}
+
+{% block current_script_id %}{{ script_id if script_id else '' }}{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .editor-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #f8f9fa;
+        overflow: hidden;
+    }
+
+    .editor-header {
+        background: white;
+        padding: 20px 40px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .title-input {
+        font-size: 24px;
+        font-weight: 600;
+        border: none;
+        outline: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: background 0.2s;
+        flex: 1;
+        max-width: 600px;
+    }
+
+    .title-input:hover {
+        background: #f3f4f6;
+    }
+
+    .title-input:focus {
+        background: #f3f4f6;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: none;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e7eb;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+
+    .editor-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 30px 40px;
+    }
+
+    .scenes-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .scene-cell {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: border-color 0.2s;
+    }
+
+    .scene-cell:hover {
+        border-color: #cbd5e1;
+    }
+
+    .scene-cell.focused {
+        border-color: #2563eb;
+    }
+
+    .scene-header {
+        padding: 12px 16px;
+        background: #f9fafb;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .scene-title-input {
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        outline: none;
+        background: transparent;
+        padding: 4px 8px;
+        border-radius: 4px;
+        flex: 1;
+        color: #1f2937;
+    }
+
+    .scene-title-input:hover {
+        background: #f3f4f6;
+    }
+
+    .scene-title-input:focus {
+        background: white;
+    }
+
+    .scene-actions {
+        display: flex;
+        gap: 6px;
+    }
+
+    .icon-btn {
+        background: none;
+        border: none;
+        padding: 6px;
+        cursor: pointer;
+        border-radius: 4px;
+        color: #6b7280;
+        font-size: 16px;
+        transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .scene-content {
+        padding: 16px;
+    }
+
+    .scene-textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 15px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+        line-height: 1.6;
+        resize: vertical;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .scene-textarea:focus {
+        border-color: #2563eb;
+    }
+
+    .add-scene-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        background: white;
+        border: 2px dashed #cbd5e1;
+        border-radius: 8px;
+        color: #6b7280;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 30px;
+    }
+
+    .add-scene-btn:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+        background: #eff6ff;
+    }
+
+    .save-status {
+        font-size: 13px;
+        color: #6b7280;
+        padding: 8px 0;
+    }
+
+    .save-status.saving {
+        color: #2563eb;
+    }
+
+    .save-status.saved {
+        color: #10b981;
+    }
+
+    /* Smooth scrolling */
+    .editor-content::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .editor-content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .editor-content::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .editor-content::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="editor-container">
+    <div class="editor-header">
+        <input 
+            type="text" 
+            class="title-input" 
+            id="scriptTitle" 
+            placeholder="Untitled Script"
+            value="{{ script.title if script else '' }}"
+        >
+        <div class="header-actions">
+            <span class="save-status" id="saveStatus"></span>
+            {% if script_id %}
+            <button class="btn btn-danger" onclick="deleteScript()">Delete</button>
+            {% endif %}
+            <button class="btn btn-secondary" onclick="window.location.href='/browse'">Close</button>
+        </div>
+    </div>
+    <div class="editor-content">
+        <div class="scenes-container" id="scenesContainer">
+            <!-- Scenes will be rendered here -->
+        </div>
+        <button class="add-scene-btn" onclick="addScene()">
+            <span>+</span>
+            <span>Add Scene</span>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}   
+<script>
+    const scriptId = '{{ script_id if script_id else "" }}';
+    // @ts-ignore - Jinja2 template syntax
+    let scenes = {{ ((script.scenes or []) if script else []) | tojson | safe }};
+    let saveTimeout;
+    let currentScriptId = scriptId;
+
+    function renderScenes() {
+        const container = document.getElementById('scenesContainer');
+        container.innerHTML = scenes.map((scene, index) => `
+            <div class="scene-cell" id="scene-${index}">
+                <div class="scene-header">
+                    <input 
+                        type="text" 
+                        class="scene-title-input" 
+                        value="${escapeHtml(scene.title)}"
+                        placeholder="Scene ${index + 1}"
+                        onchange="updateSceneTitle(${index}, this.value)"
+                        onfocus="focusScene(${index})"
+                        onblur="blurScene(${index})"
+                    >
+                    <div class="scene-actions">
+                        <button class="icon-btn" onclick="moveSceneUp(${index})" title="Move up" ${index === 0 ? 'disabled' : ''}>↑</button>
+                        <button class="icon-btn" onclick="moveSceneDown(${index})" title="Move down" ${index === scenes.length - 1 ? 'disabled' : ''}>↓</button>
+                        <button class="icon-btn" onclick="deleteScene(${index})" title="Delete">🗑️</button>
+                    </div>
+                </div>
+                <div class="scene-content">
+                    <textarea 
+                        class="scene-textarea" 
+                        placeholder="Write your scene content here..."
+                        onchange="updateSceneContent(${index}, this.value)"
+                        oninput="autoSave()"
+                        onfocus="focusScene(${index})"
+                        onblur="blurScene(${index})"
+                    >${escapeHtml(scene.content)}</textarea>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addScene() {
+        scenes.push({
+            title: `Scene ${scenes.length + 1}`,
+            content: ''
+        });
+        renderScenes();
+        autoSave();
+        
+        // Focus on the new scene's textarea
+        setTimeout(() => {
+            const lastScene = document.querySelector(`#scene-${scenes.length - 1} .scene-textarea`);
+            if (lastScene) {
+                lastScene.focus();
+            }
+        }, 100);
+    }
+
+    function updateSceneTitle(index, title) {
+        scenes[index].title = title;
+        autoSave();
+    }
+
+    function updateSceneContent(index, content) {
+        scenes[index].content = content;
+        autoSave();
+    }
+
+    function moveSceneUp(index) {
+        if (index > 0) {
+            [scenes[index - 1], scenes[index]] = [scenes[index], scenes[index - 1]];
+            renderScenes();
+            autoSave();
+        }
+    }
+
+    function moveSceneDown(index) {
+        if (index < scenes.length - 1) {
+            [scenes[index], scenes[index + 1]] = [scenes[index + 1], scenes[index]];
+            renderScenes();
+            autoSave();
+        }
+    }
+
+    function deleteScene(index) {
+        if (confirm('Are you sure you want to delete this scene?')) {
+            scenes.splice(index, 1);
+            renderScenes();
+            autoSave();
+        }
+    }
+
+    function focusScene(index) {
+        const sceneCell = document.getElementById(`scene-${index}`);
+        if (sceneCell) {
+            sceneCell.classList.add('focused');
+        }
+    }
+
+    function blurScene(index) {
+        const sceneCell = document.getElementById(`scene-${index}`);
+        if (sceneCell) {
+            sceneCell.classList.remove('focused');
+        }
+    }
+
+    function autoSave() {
+        clearTimeout(saveTimeout);
+        showSaveStatus('saving');
+        
+        saveTimeout = setTimeout(async () => {
+            await saveScript();
+        }, 1000);
+    }
+
+    async function saveScript() {
+        const title = document.getElementById('scriptTitle').value || 'Untitled Script';
+        
+        const data = {
+            title: title,
+            scenes: scenes
+        };
+
+        try {
+            let response;
+            if (currentScriptId) {
+                response = await fetch(`/api/scripts/${currentScriptId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+            } else {
+                response = await fetch('/api/scripts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    currentScriptId = result.id;
+                    // Update URL without reload
+                    window.history.replaceState({}, '', `/edit/${currentScriptId}`);
+                }
+            }
+
+            if (response.ok) {
+                showSaveStatus('saved');
+                loadScripts(); // Reload sidebar
+            }
+        } catch (error) {
+            console.error('Error saving script:', error);
+            showSaveStatus('error');
+        }
+    }
+
+    function showSaveStatus(status) {
+        const statusEl = document.getElementById('saveStatus');
+        statusEl.className = `save-status ${status}`;
+        
+        switch(status) {
+            case 'saving':
+                statusEl.textContent = 'Saving...';
+                break;
+            case 'saved':
+                statusEl.textContent = 'Saved';
+                setTimeout(() => {
+                    statusEl.textContent = '';
+                }, 2000);
+                break;
+            case 'error':
+                statusEl.textContent = 'Error saving';
+                break;
+        }
+    }
+
+    async function deleteScript() {
+        if (!currentScriptId) return;
+        
+        if (confirm('Are you sure you want to delete this script? This cannot be undone.')) {
+            try {
+                const response = await fetch(`/api/scripts/${currentScriptId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/browse';
+                }
+            } catch (error) {
+                console.error('Error deleting script:', error);
+            }
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Auto-save on title change
+    document.getElementById('scriptTitle').addEventListener('input', autoSave);
+
+    // Initial render
+    renderScenes();
+
+    // Add initial scene if empty
+    if (scenes.length === 0) {
+        addScene();
+    }
+</script>
+{% endblock %}

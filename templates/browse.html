@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Scripts - YouTube Script Manager{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .browse-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #f8f9fa;
+    }
+
+    .browse-header {
+        background: white;
+        padding: 30px 40px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .browse-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 8px;
+    }
+
+    .browse-header p {
+        color: #6b7280;
+        font-size: 15px;
+    }
+
+    .browse-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 40px;
+    }
+
+    .scripts-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .script-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 24px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .script-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+        border-color: #cbd5e1;
+    }
+
+    .script-card-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .script-card-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+
+    .script-card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .script-card-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: #6b7280;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .script-card-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .script-card-preview {
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.5;
+        max-height: 60px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    .empty-browse {
+        text-align: center;
+        padding: 80px 20px;
+    }
+
+    .empty-browse-icon {
+        font-size: 80px;
+        margin-bottom: 24px;
+        opacity: 0.3;
+    }
+
+    .empty-browse h2 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 12px;
+    }
+
+    .empty-browse p {
+        color: #6b7280;
+        font-size: 16px;
+        margin-bottom: 24px;
+    }
+
+    .empty-browse-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: #2563eb;
+        color: white;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .empty-browse-btn:hover {
+        background: #1d4ed8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="browse-container">
+    <div class="browse-header">
+        <h1>Your Scripts</h1>
+        <p>Manage and organize your YouTube video scripts</p>
+    </div>
+    <div class="browse-content">
+        <div class="scripts-grid" id="scriptsGrid">
+            <!-- Scripts will be loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    async function loadBrowseScripts() {
+        try {
+            const response = await fetch('/api/scripts');
+            const scripts = await response.json();
+            const scriptsGrid = document.getElementById('scriptsGrid');
+            
+            const scriptsArray = Object.values(scripts).sort((a, b) => 
+                new Date(b.updated_at) - new Date(a.updated_at)
+            );
+
+            if (scriptsArray.length === 0) {
+                scriptsGrid.innerHTML = `
+                    <div class="empty-browse" style="grid-column: 1 / -1;">
+                        <div class="empty-browse-icon">📝</div>
+                        <h2>No scripts yet</h2>
+                        <p>Create your first YouTube script to get started</p>
+                        <a href="/new" class="empty-browse-btn">Create Your First Script</a>
+                    </div>
+                `;
+                return;
+            }
+
+            scriptsGrid.innerHTML = scriptsArray.map(script => {
+                const date = new Date(script.updated_at);
+                const formattedDate = date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                const sceneCount = script.scenes ? script.scenes.length : 0;
+                const preview = script.scenes && script.scenes.length > 0 
+                    ? script.scenes[0].content.substring(0, 150)
+                    : 'No content yet';
+                
+                return `
+                    <a href="/edit/${script.id}" class="script-card">
+                        <div class="script-card-icon">🎬</div>
+                        <div class="script-card-title">${escapeHtml(script.title)}</div>
+                        <div class="script-card-meta">
+                            <div class="script-card-meta-item">
+                                <span>📅</span>
+                                <span>${formattedDate}</span>
+                            </div>
+                            <div class="script-card-meta-item">
+                                <span>🎞️</span>
+                                <span>${sceneCount} scene${sceneCount !== 1 ? 's' : ''}</span>
+                            </div>
+                        </div>
+                        <div class="script-card-preview">${escapeHtml(preview)}</div>
+                    </a>
+                `;
+            }).join('');
+        } catch (error) {
+            console.error('Error loading scripts:', error);
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadBrowseScripts);
+</script>
+{% endblock %}

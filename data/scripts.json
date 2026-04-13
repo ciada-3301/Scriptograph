@@ -4,11 +4,51 @@
     "title": "Number System",
     "scenes": [
       {
-        "title": "Hook",
-        "content": ""
+        "content": "Everything you see on your screen right now, are just numbers. Games, Videos and even the frame you are watching right now is not English, not images, just numbers. And today we are going to decode how computers understand these numbers and perform various operations. \n",
+        "title": "Hook"
+      },
+      {
+        "content": "Hi everyone, welcome back ! My name is Arkadyuti and this is the first episode of the class 11 computer science series. By the end of this video, you\u2019ll understand:\n\nWhat number systems are\nBinary, Octal, Decimal, Hexadecimal number systems\nAnd how to convert between them like a pro\u201d\n\nSo lets start.\n",
+        "title": "Intro"
+      },
+      {
+        "content": "Imagine a number\u2026 say 729. What does this actually mean ? \n\nIt means, there are 7 hundreds, 2 tens and 9 ones. so basically the number can be written as 7 \u00d7 100 + 2 \u00d7 10 + 9 \u00d7 1.\nAnd if we go one step deeper,\n100 is 10\u00b2,\n10 is 10\u00b9,\nand 1 is 10\u2070.\n\nSo now the same number can be expanded as:\n7 \u00d7 10\u00b2 + 2 \u00d7 10\u00b9 + 9 \u00d7 10\u2070 = 729.\n\nNotice something interesting ? \n\nAs we move from right to left,\nthe power of 10 keeps increasing.\nBut you may ask\nWhy base 10?\nWhy not 9\u2026 or 11?\nThe reason is simple.\nIn the decimal number system,\nwe only have 10 digits:\n0 to 9.\nThis number is also called as the base of a number system...which is 10 in case of decimal.\n\nVarious number systems have various bases. For example binary has base 2, octal has base 8 and hexadecimal has base 16. Note that the base of a number system also denotes how many digits the number system has in total.\n",
+        "title": "What is a number System ?"
+      },
+      {
+        "content": "Now let us study the binary system in detail. \nUnlike decimal, which uses 10 digits, binary uses only two:\n0 and 1.\nThat\u2019s it. No other digits, just 0 and 1. So you might be wondering how can just two digits represent everything? Well that question of yours's will be answered in the next video, logic gates and computer systems. But for now, don't let curiosity kill the cat.\n\nAnyways moving ahead, \nNow just like decimal uses powers of 10, binary uses powers of 2. To understand, lets take an example, say 1011, just like decimal, here too each number will get multiplied with a power of 2, starting from zero and increasing as we go left.  So\n1011 can be expanded as 1 \u00d7 2\u2070 + 1 \u00d7 2\u00b9 + 0 \u00d7 2\u00b2 + 1 \u00d7 2\u00b3\n and solving further, we get the value as 11. So in simple words, 11 is the decimal representation of binary 1011 and this is the process by which we convert a binary number into decimal. \n\nLet's take another example, say 10010.........(do the same thing again)\nNow converting a decimal number into binary is a pretty easy one. You just keep dividing the number by the base, which is 2, and record the remainder in each division step until you cannot divide anymore. \nAfter you are done, arrange all the remainders in the reverse order, starting from the last one to the first one. Congrats, you just converted a binary number to decimal.\n",
+        "title": "Binary"
+      },
+      {
+        "title": "Octal",
+        "content": "Next on our list is octal number system. As the name suggests, octal number system has 8 digits in total, starting from 0 all the up to 7. So, the base in this case will be 8. Conversion between decimal and octal is exactly same as we had just done in binary, except just use 8 instead of 2. \n\nFor example to convert 237 in octal to decimal, we write the following expanded form using powers of 8 as previously done in binary and decimal. and then add all the terms together to obtain our decimal version of that number which is 159.\n\nInterestingly, converting decimal to octal is also exactly same as binary, just that we need to use 8 instead of 2....then keep dividing until we cannot, and then collect the reminders in the reverse order of their arrival.\n\nBut there is an interesting caveat here. By this point we know that each place in octal system can be represented as a multiple of the power of 8. and 8 is 2 cube. this means one octal digit can represent a 3 digit binary number. Lets try to visualize this :\nLet\u2019s take:\n110101\n\nNow group from right:\n\n(110)(101)\n\nNow convert each group:\n\n110 = 6\n101 = 5\n\nSo:\n\ud83d\udc49 110101 = 65 (octal)\n\nThis way you can convert binary to octal directly. It is very natural to not understand this part on the first go, please consider rewinding and watching it a second time.\n"
+      },
+      {
+        "title": "Hexadecimal",
+        "content": "Now let's proceed to Hexadecimal number system. And as you expect, hexadecimal number system has 16 numbers, ranging from 0 to 9 and because there are no more digits, we use additional 6 alphabets A to F. Now here A here means 10, B means 11 and so on and so forth until F which is 15. \n\nInter-converting between hexadecimal and decimal is also similar to how we did it previously for binary and octal.\n\n\nJust expand using powers of 16 instead.\n\nLet\u2019s say 4C.\n\nNow, just like before, we assign powers from right to left:\n\n4 \u00d7 16\u00b9 + C \u00d7 16\u2070\n\nBut remember,\nC represents 12.\n\nSo this becomes:\n\n4 \u00d7 16 + 12 \u00d7 1\n= 64 + 12\n= 76\n\nSo,\n\ud83d\udc49 4C in hexadecimal is equal to 76 in decimal.\n\nNow let\u2019s go the other way.\n\nConverting decimal to hexadecimal follows the exact same pattern we\u2019ve already seen.\n\nWe simply divide by 16 and keep track of remainders.\n\nLet\u2019s take 76 again:\n\n76 \u00f7 16 = 4 remainder 12\n\nNow 12 is represented as C.\n\nSo the answer becomes:\n\ud83d\udc49 4C\n\nNow here comes the interesting part\u2026\n\nJust like we grouped binary digits in sets of 3 for octal,\nwe group them in sets of 4 for hexadecimal.\n\nWhy 4?\n\nBecause:\n2\u2074 = 16\n\nSo one hexadecimal digit can represent exactly 4 binary digits.\n\nTake the binary number:\n11001100\n\nGroup from right:\n\n(1100)(1100)\n\nNow convert each group:\n\n1100 = 12 = C\n1100 = 12 = C\n\nSo:\n\ud83d\udc49 11001100 = CC (hexadecimal)"
+      },
+      {
+        "title": "Conclusion",
+        "content": "If you liked this video then please consider liking and subscribing, also comment down below if you want a dedicated video on problem solving related to this chapter, what I could improve.\n"
+      },
+      {
+        "title": "Outro",
+        "content": "\u201cNo matter which number system we use\u2026\n\nthe rules never really change.\n\nWe\u2019re always:\n\nExpanding using powers of the base\nOr reducing using division by the base\n\nDifferent systems\u2026\nsame logic\u2026 just a different lens."
       }
     ],
     "created_at": "2026-04-12T10:17:44.358438",
-    "updated_at": "2026-04-12T10:25:11.464987"
+    "updated_at": "2026-04-13T14:11:48.984323"
+  },
+  "20260413141152124343": {
+    "id": "20260413141152124343",
+    "title": "Untitled Script",
+    "scenes": [
+      {
+        "title": "Scene 1",
+        "content": ""
+      }
+    ],
+    "created_at": "2026-04-13T14:11:52.124675",
+    "updated_at": "2026-04-13T14:11:52.124682"
   }
 }
